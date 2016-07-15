@@ -5,15 +5,15 @@ runDir="/opt/guardian"
 logFile="$runDir/guard-"`date +"%Y-%m-%d"`".log"
 logMaxSize=1024   # 1mb
 runInterval=10 # In seconds
-SERVICE_COMMAND=/etc/init.d/$SERVICE
-SERVICE_RETRIES=4
-ALERT_EMAIL=subscribe@andreasheumaier.de
+service_command=/etc/init.d/$SERVICE
+service_retries=4
+alert_email=subscribe@andreasheumaier.de
 
 
 # Notify Hook
 notify() {
  echo 'send email '
- cat $runDir/mail_template.txt | mail -s "Service Alert" $ALERT_EMAIL
+ cat $runDir/mail_template.txt | mail -s "Service Alert" $alert_email
 }
 
 # Generic log function.
@@ -22,7 +22,7 @@ log() {
 }
 
 service_state() {
-  if $SERVICE_COMMAND status; then
+  if $service_command status; then
     return 0
   else
     return 1
@@ -30,11 +30,11 @@ service_state() {
 }
 
 service_restart() {
-  x=1; while [ $x -le $SERVICE_RETRIES ]
+  x=1; while [ $x -le $service_retries ]
   do
     if ! service_state; then
-    $SERVICE_COMMAND stop
-    $SERVICE_COMMAND start
+    $service_command stop
+    $service_command start
     sleep 10
     x=$(( $x + 1 ))
     fi
@@ -84,7 +84,7 @@ show_help() {
    #Usage:
        -h                       display this help and exit
        -s SERVICE               service to check
-       -i INERVALL              service check intervall in sec, default to 30s
+       -i INTERVALL              service check intervall in sec, default to 30s
        -r RETRY_COUNT           How often the service should be restarted, default to 4
        -c RETRY_COUNT_INTERVALL Wait time in sec between restart check retries, defaults to 30s
   "
@@ -101,10 +101,10 @@ while getopts ":s:i:r:c:m:" opt; do
       runInterval=$OPTARG
       ;;
     r)
-      SERVICE_RETRIES=$OPTARG
+      service_retries=$OPTARG
       ;;
     m)
-      ALERT_EMAIL=$OPTARG
+      alert_email=$OPTARG
       ;;
     ?)
       show_help >&2
