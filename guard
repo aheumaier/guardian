@@ -50,7 +50,8 @@ checkCommands() {
   else
     log "ERROR restarting $SERVICE"
     service_restart
-    break
+    log "No improvemts found  - giving up"
+    exit 1
   fi
 }
 
