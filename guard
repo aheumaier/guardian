@@ -1,0 +1,84 @@
+#!/bin/bash
+
+service=atd
+runDir="/opt/guardian"
+logFile="$runDir/guard-"`date +"%Y-%m-%d"`".log"
+logMaxSize=1024   # 1mb
+runInterval=10 # In seconds
+SERVICE_COMMAND=/etc/init.d/$SERVICE
+SERVICE_RETRIES=4
+ALERT_EMAIL=subscribe@andreasheumaier.de
+
+
+# Notify Hook
+notify() {
+ echo 'send email '
+ cat $runDir/mail_template.txt | mail -s "Service Alert" $ALERT_EMAIL
+}
+
+# Generic log function.
+log() {
+  echo "$1" >> "$logFile"
+}
+
+service_state() {
+  if $SERVICE_COMMAND status; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+service_restart() {
+  x=1; while [ $x -le $SERVICE_RETRIES ]
+  do
+    if ! service_state; then
+    $SERVICE_COMMAND stop
+    $SERVICE_COMMAND start
+    sleep 10
+    x=$(( $x + 1 ))
+    fi
+  done
+
+  notify
+}
+
+# Tis is the executed alert logic for the loop
+checkCommands() {
+  if service_state; then
+    log "OK $SERVICE is fine"
+  else
+    log "ERROR restarting $SERVICE"
+    service_restart
+  fi
+}
+
+# This is the main daemon loop
+loop() {
+
+  now=`date +%s`
+
+  if [ -z $last ]; then
+    last=`date +%s`
+  fi
+
+  # Do everything you need the daemon to do.
+  checkCommands
+
+  # Check to see how long we actually need to sleep for. If we want this to run
+  # once a minute and it's taken more than a minute, then we should just run it
+  # anyway.
+  last=`date +%s`
+
+  # Set the sleep interval
+  if [[ ! $((now-last+runInterval+1)) -lt $((runInterval)) ]]; then
+    sleep $((now-last+runInterval))
+  fi
+
+  # Startover
+  loop
+}
+
+## main runner
+echo $$ > /opt/guardian/guard.pid
+loop
