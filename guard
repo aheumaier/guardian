@@ -50,6 +50,7 @@ checkCommands() {
   else
     log "ERROR restarting $SERVICE"
     service_restart
+    break
   fi
 }
 
