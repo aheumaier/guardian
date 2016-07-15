@@ -79,6 +79,46 @@ loop() {
   loop
 }
 
+show_help() {
+   echo "
+   #Usage:
+       -h                       display this help and exit
+       -s SERVICE               service to check
+       -i INERVALL              service check intervall in sec, default to 30s
+       -r RETRY_COUNT           How often the service should be restarted, default to 4
+       -c RETRY_COUNT_INTERVALL Wait time in sec between restart check retries, defaults to 30s
+  "
+}
+
 ## main runner
-echo $$ > /opt/guardian/guard.pid
-loop
+unset name
+while getopts ":s:i:r:c:m:" opt; do
+  case $opt in
+    s)
+      service=$OPTARG
+      ;;
+    i)
+      runInterval=$OPTARG
+      ;;
+    r)
+      SERVICE_RETRIES=$OPTARG
+      ;;
+    m)
+      ALERT_EMAIL=$OPTARG
+      ;;
+    ?)
+      show_help >&2
+      exit 1
+      ;;
+  esac
+done
+
+if [ $OPTIND -eq 1 ]
+then
+   show_help
+   exit
+else
+  echo $$ > /opt/guardian/guard.pid
+  loop
+fi
+
