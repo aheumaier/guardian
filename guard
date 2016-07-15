@@ -7,6 +7,7 @@ logMaxSize=1024   # 1mb
 runInterval=10 # In seconds
 service_command=/etc/init.d/$service
 service_retries=4
+sleep=30
 alert_email=subscribe@andreasheumaier.de
 
 
@@ -18,7 +19,7 @@ notify() {
 
 # Generic log function.
 log() {
-  echo "$1" >> "$logFile"
+  echo "$(date): $1" >> "$logFile"
 }
 
 service_state() {
@@ -33,9 +34,9 @@ service_restart() {
   x=1; while [ $x -le $service_retries ]
   do
     if ! service_state; then
-    $service_command stop
-    $service_command start
-    sleep 10
+    $service_command stop >&2
+    $service_command start >&2
+    sleep $sleep
     x=$(( $x + 1 ))
     fi
   done
@@ -46,9 +47,9 @@ service_restart() {
 # Tis is the executed alert logic for the loop
 checkCommands() {
   if service_state; then
-    log "OK $SERVICE is fine"
+    log "OK $service is fine"
   else
-    log "ERROR restarting $SERVICE"
+    log "ERROR restarting $service"
     service_restart
     log "No improvemts found  - giving up"
     exit 1
@@ -105,6 +106,8 @@ while getopts ":s:i:r:c:m:" opt; do
     r)
       service_retries=$OPTARG
       ;;
+    c)
+      sleep=$OPTARG
     m)
       alert_email=$OPTARG
       ;;
