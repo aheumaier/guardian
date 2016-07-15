@@ -5,7 +5,7 @@ runDir="/opt/guardian"
 logFile="$runDir/guard-"`date +"%Y-%m-%d"`".log"
 logMaxSize=1024   # 1mb
 runInterval=10 # In seconds
-service_command=/etc/init.d/$SERVICE
+service_command=/etc/init.d/$service
 service_retries=4
 alert_email=subscribe@andreasheumaier.de
 
