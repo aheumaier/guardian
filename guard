@@ -34,6 +34,7 @@ service_restart() {
   x=1; while [ $x -le $service_retries ]
   do
     if ! service_state; then
+    log "ERROR: restarting $service now"
     $service_command stop >&2
     $service_command start >&2
     sleep $sleep
@@ -49,10 +50,10 @@ checkCommands() {
   if service_state; then
     log "OK $service is fine"
   else
-    log "ERROR restarting $service"
+    log "ERROR: Try to restart $service"
     service_restart
     log "No improvemts found  - giving up"
-    exit 1
+    rm -f $runDir/guard.pid ; exit 1
   fi
 }
 
@@ -123,7 +124,7 @@ then
    show_help
    exit
 else
-  echo $$ > /opt/guardian/guard.pid
+  echo $$ > $runDir/guard.pid
   loop
 fi
 
