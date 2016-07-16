@@ -17,7 +17,7 @@ LOCKFILE=/var/lock/subsys/$prog
 GUARDIAN_DIR=/opt/guardian
 GUARDIAN_USER=root
 PIDFILE="$GUARDIAN_DIR/guard.pid"
-GUARDIAN_OPTS='-s atd -i 6 -r 4 -c6'
+GUARDIAN_OPTS='-s atd -i 30 -r 4 -c 30'
 
 #Source env vars - overwrite defaults
 . /etc/sysconfig/guard
@@ -25,7 +25,7 @@ GUARDIAN_OPTS='-s atd -i 6 -r 4 -c6'
 
 start() {
         echo -n "Starting $prog: "
-        daemon --user $GUARDIAN_USER --pidfile="$PIDFILE" $GUARDIAN_DIR/guard $GUARDIAN_OPTS &
+        daemon --user $GUARDIAN_USER --pidfile="$PIDFILE" $GUARDIAN_DIR/guard $GUARDIAN_OPTS &>/dev/null &
         RETVAL=$?
         [ $RETVAL -eq 0 ] && touch $LOCKFILE
         echo

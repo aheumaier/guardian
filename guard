@@ -35,8 +35,8 @@ service_restart() {
   do
     if ! service_state; then
     log "ERROR: restarting $service now"
-    $service_command stop >&2
-    $service_command start >&2
+    $service_command stop &>/dev/null
+    $service_command start &>/dev/null
     sleep $sleep
     x=$(( $x + 1 ))
     fi
