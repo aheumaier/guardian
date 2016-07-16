@@ -3,11 +3,13 @@
 # guardian    GuardianServer Open Source Edition 0.1.1
 #
 # chkconfig: 345 70 30
-# description: guard Server is a smal supervisor scripts for process watchdog handling 
+# description: guard Server is a small supervisor scripts for process watchdog handling
 # processname: guard
 
 # Source function library.
 . /etc/init.d/functions
+
+
 
 RETVAL=0
 prog="guard"
@@ -15,12 +17,15 @@ LOCKFILE=/var/lock/subsys/$prog
 GUARDIAN_DIR=/opt/guardian
 GUARDIAN_USER=root
 PIDFILE="$GUARDIAN_DIR/guard.pid"
-GUARDIAN_OPTS=''
+GUARDIAN_OPTS='-s atd -i 6 -r 4 -c6'
+
+#Source env vars - overwrite defaults
+. /etc/sysconfig/guard
 
 
 start() {
         echo -n "Starting $prog: "
-        daemon --user $GUARDIAN_USER --pidfile="$PIDFILE" $GUARDIAN_DIR/guard $GUARDIAN_OPTS & 
+        daemon --user $GUARDIAN_USER --pidfile="$PIDFILE" $GUARDIAN_DIR/guard $GUARDIAN_OPTS &
         RETVAL=$?
         [ $RETVAL -eq 0 ] && touch $LOCKFILE
         echo
