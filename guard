@@ -52,7 +52,7 @@ checkCommands() {
   else
     log "ERROR: Try to restart $service"
     service_restart
-    log "No improvemts found  - giving up"
+    log "No improved state found  - giving up"
     rm -f $runDir/guard.pid ; exit 1
   fi
 }
